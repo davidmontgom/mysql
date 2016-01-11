@@ -7,7 +7,7 @@ cluster_slug = File.read("/var/cluster_slug.txt")
 cluster_slug = cluster_slug.gsub(/\n/, "") 
 
 data_bag("server_data_bag")
-mysql_server = data_bag_item("server_data_bag", server_type)
+fabric_server = data_bag_item("server_data_bag", server_type)
 password = fabric_server[datacenter][environment][location][cluster_slug]['meta']['password']
 
 #http://dev.mysql.com/doc/mysql-utilities/1.5/en/fabric.html
