@@ -67,7 +67,7 @@ bash "change_dir" do
     touch #{Chef::Config[:file_cache_path]}/apparmor.lock
   EOH
   action :run
-  not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql_user.lock")}
+  not_if {File.exists?("#{Chef::Config[:file_cache_path]}/apparmor.lock")}
 end
 
     
@@ -102,8 +102,11 @@ bash "add_user" do
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql_user.lock")}
 end
 
-
-
+=begin
+echo "ALTER USER 'root'@'localhost' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
+echo "grant all privileges on *.* to 'root'@'%' identified by 'Test101';" | mysql -u root -pTest101
+echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101
+=end
 
 
 
