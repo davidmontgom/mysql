@@ -11,6 +11,16 @@ fabric_server = data_bag_item("server_data_bag", server_type)
 password = fabric_server[datacenter][environment][location][cluster_slug]['meta']['password']
 
 #http://dev.mysql.com/doc/mysql-utilities/1.5/en/fabric.html
+bash "fu" do
+  user "root"
+  cwd "#{Chef::Config[:file_cache_path]}"
+  code <<-EOH
+    
+    touch /var/fu1_#{cluster_slug}
+    touch /var/fu_#{password}
+  EOH
+  action :run
+end
 
 bash "install_fabric" do
   user "root"
