@@ -52,7 +52,7 @@ end
 
 service "mysql" do
   action :stop
-  not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql_lock")}
+  not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql.lock")}
 end
 
 
