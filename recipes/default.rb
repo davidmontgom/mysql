@@ -6,6 +6,8 @@ slug = node.name.split('-')[4]
 cluster_slug = File.read("/var/cluster_slug.txt")
 cluster_slug = cluster_slug.gsub(/\n/, "") 
 
+
+
 data_bag("server_data_bag")
 mysql_server = data_bag_item("server_data_bag", server_type)
 password = mysql_server[datacenter][environment][location][cluster_slug]['meta']['password']
@@ -71,14 +73,29 @@ bash "change_dir" do
 end
 
     
+if server_type == "mysql"
+  cluster_index = File.read("/var/cluster_index.txt")
+  cluster_index = cluster_index.gsub(/\n/, "") 
+  template "/etc/mysql/my.cnf" do
+    path "/etc/mysql/my.cnf"
+    source "my.5.7.cnf.erb"
+    owner "root"
+    group "root"
+    mode "0644"
+    notifies :start, resources(:service => "mysql")
+    variables :cluster_index => cluster_index
+  end
+end
 
-template "/etc/mysql/my.cnf" do
-  path "/etc/mysql/my.cnf"
-  source "my.5.7.cnf.erb"
-  owner "root"
-  group "root"
-  mode "0644"
-  notifies :start, resources(:service => "mysql")
+if server_type == "fabric"
+  template "/etc/mysql/my.cnf" do
+    path "/etc/mysql/my.cnf"
+    source "my.5.7.fabric.cnf.erb"
+    owner "root"
+    group "root"
+    mode "0644"
+    notifies :start, resources(:service => "mysql")
+  end
 end
 
 

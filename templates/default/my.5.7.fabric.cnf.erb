@@ -48,15 +48,6 @@ log-error	= /var/log/mysql/error.log
 # Disabling symbolic-links is recommended to prevent assorted security risks
 symbolic-links=0
 
-# server id should be different for each instance
-server-id = <%= @cluster_index %>
-# enable binlog
-log-bin = mysql-bin
-log-slave-updates = true
-# enable GTID
-gtid-mode = on
-enforce-gtid-consistency = true
-
 
 
 # * IMPORTANT: Additional settings that can override those from this file!

@@ -71,7 +71,19 @@ template "/etc/mysql/fabric.cfg" do
   }}
 end
 
+
+
 =begin
+https://dev.mysql.com/tech-resources/articles/mysql-fabric-ga.html
+mysqlfabric manage setup --param=storage.user=fabric
+mysqlfabric group create druid
+mysqlfabric group add druid 198.211.97.48:3306
+mysqlfabric group promote druid
+mysqlfabric group health druid
+mysqlfabric group lookup_servers druid
+
+
+
 #http://dev.mysql.com/doc/mysql-utilities/1.5/en/fabric-quick-start-replication.html
 mysqlfabric manage start   --daemonize --config=/var/fabric.conf
 mysqlfabric manage stop
