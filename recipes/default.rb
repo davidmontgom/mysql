@@ -7,6 +7,16 @@
 #grant all privileges on *.* to 'root'@'%' identified by 'Feed312!';
 #FLUSH PRIVILEGES;
 
+=begin
+directory "/data" do
+  mode "0777"
+  owner 'mysql'
+  group 'mysql'
+  action :create
+end
+=end
+
+
 bash "install_mysql" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
@@ -28,12 +38,25 @@ service "mysql" do
   action :stop
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql_lock")}
 end
-=begin
+
 template "/etc/mysql/my.cnf" do
   path "/etc/mysql/my.cnf"
   source "my.5.7.cnf.erb"
   owner "root"
   group "root"
   mode "0644"
+  notifies :start, resources(:service => "mysql")
 end
-=end
+
+
+service "mysql" do
+  supports :start => true, :stop => true
+  action [ :enable, :start]
+end
+
+
+
+
+
+
+
