@@ -16,18 +16,20 @@ password = mysql_server[datacenter][environment][location][cluster_slug]['meta']
 #FLUSH PRIVILEGES;
 
 directory "/data" do
-  owner "mysql"
-  group "mysql"
-  mode "0700"
+  owner "root"
+  group "root"
+  mode "0777"
   action :create
 end
 
+=begin
 directory "/data/mysql" do
   owner "mysql"
   group "mysql"
   mode "0700"
   action :create
 end
+=end
 
 
 
@@ -53,6 +55,23 @@ service "mysql" do
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql_lock")}
 end
 
+
+bash "change_dir" do
+  user "root"
+  cwd "#{Chef::Config[:file_cache_path]}"
+  code <<-EOH
+    service apparmor stop
+    sed 's:/var/lib/mysql:/data/mysql:g' -i /etc/apparmor.d/usr.sbin.mysqld
+    mv /var/lib/mysql /data
+    service apparmor start
+    touch #{Chef::Config[:file_cache_path]}/apparmor.lock
+  EOH
+  action :run
+  not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql_user.lock")}
+end
+
+    
+
 template "/etc/mysql/my.cnf" do
   path "/etc/mysql/my.cnf"
   source "my.5.7.cnf.erb"
@@ -67,6 +86,7 @@ service "mysql" do
   supports :start => true, :stop => true
   action [ :enable, :start]
 end
+
 
 
 bash "add_user" do
