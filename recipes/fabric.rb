@@ -66,12 +66,24 @@ template "/etc/mysql/fabric.cfg" do
   group "root"
   mode "0644"
   #notifies :start, resources(:service => "mysql")
-  variables lazy {{
-    :password => "#{password}", 
-  }}
+  variables :password => "#{password}"
 end
 
 
+execute "restart_supervisorctl_fabric" do
+  command "sudo supervisorctl restart fabric_server:"
+  action :nothing
+end
+
+template "/etc/supervisor/conf.d/fabric.conf" do
+  path "/etc/supervisor/conf.d/fabric.conf"
+  source "supervisord.fabric.conf.erb"
+  owner "root"
+  group "root"
+  mode "0755"
+  #notifies :restart, resources(:service => "supervisord")
+  notifies :run, "execute[restart_supervisorctl_fabric]"
+end
 
 =begin
 https://dev.mysql.com/tech-resources/articles/mysql-fabric-ga.html
