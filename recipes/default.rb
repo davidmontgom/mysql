@@ -1,20 +1,34 @@
+datacenter = node.name.split('-')[0]
+environment = node.name.split('-')[1]
+location = node.name.split('-')[2]
+server_type = node.name.split('-')[3]
+slug = node.name.split('-')[4] 
+cluster_slug = File.read("/var/cluster_slug.txt")
+cluster_slug = cluster_slug.gsub(/\n/, "") 
+
+data_bag("server_data_bag")
+mysql_server = data_bag_item("server_data_bag", server_type)
+password = mysql_server[datacenter][environment][location][cluster_slug]['meta']['password']
 
 #http://dev.mysql.com/doc/mysql-apt-repo-quick-guide/en/#repo-qg-apt-repo-manual-setup
-
-
-
-#ALTER USER 'root'@'localhost' IDENTIFIED BY 'Feed312!';
-#grant all privileges on *.* to 'root'@'%' identified by 'Feed312!';
+#ALTER USER 'root'@'localhost' IDENTIFIED BY 'Test101';
+#grant all privileges on *.* to 'root'@'%' identified by 'Test101';
 #FLUSH PRIVILEGES;
 
-=begin
 directory "/data" do
-  mode "0777"
-  owner 'mysql'
-  group 'mysql'
+  owner "mysql"
+  group "mysql"
+  mode "0700"
   action :create
 end
-=end
+
+directory "/data/mysql" do
+  owner "mysql"
+  group "mysql"
+  mode "0700"
+  action :create
+end
+
 
 
 bash "install_mysql" do
@@ -54,6 +68,19 @@ service "mysql" do
   action [ :enable, :start]
 end
 
+
+bash "add_user" do
+  user "root"
+  cwd "#{Chef::Config[:file_cache_path]}"
+  code <<-EOH
+    echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '#{password}';" | mysql -u root -p#{password}
+    echo "grant all privileges on *.* to 'root'@'%' identified by '#{password}';" | mysql -u root -p#{password}
+    echo "FLUSH PRIVILEGES;" | mysql -u root -p#{password}
+    touch #{Chef::Config[:file_cache_path]}/mysql_user.lock
+  EOH
+  action :run
+  not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql_user.lock")}
+end
 
 
 
