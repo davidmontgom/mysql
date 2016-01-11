@@ -6,7 +6,7 @@ logdir = /var/log
 [storage]
 address = localhost:3306
 user = fabric_store
-password = secret
+password = <%= @password %>
 database = mysql_fabric
 auth_plugin = mysql_native_password
 connection_timeout = 6
@@ -15,18 +15,18 @@ connection_delay = 1
 
 [servers]
 user = fabric_server
-password = secret
+password = <%= @password %>
 backup_user = fabric_backup
-backup_password = secret
+backup_password = <%= @password %>
 restore_user = fabric_restore
-restore_password = secret
+restore_password = <%= @password %>
 unreachable_timeout = 5
 
 [protocol.xmlrpc]
 address = localhost:32274
 threads = 5
 user = admin
-password = secret
+password = <%= @password %>
 disable_authentication = no
 realm = MySQL Fabric
 ssl_ca = 
@@ -36,7 +36,7 @@ ssl_key =
 [protocol.mysql]
 address = localhost:32275
 user = admin
-password = secret
+password = <%= @password %>
 disable_authentication = no
 ssl_ca = 
 ssl_cert = 

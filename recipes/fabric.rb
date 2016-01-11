@@ -65,6 +65,9 @@ template "/etc/mysql/fabric.cfg" do
   group "root"
   mode "0644"
   #notifies :start, resources(:service => "mysql")
+  variables lazy {{
+    :password => "#{password}", 
+  }}
 end
 
 =begin
