@@ -15,7 +15,6 @@ bash "fu" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
-    
     touch /var/fu1_#{cluster_slug}
     touch /var/fu_#{password}
   EOH
