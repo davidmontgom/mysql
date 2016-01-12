@@ -52,16 +52,14 @@ bash "install_mysql" do
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql.lock")}
 end
 
-service "mysql" do
-  action :stop
-  not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql.lock")}
-end
+
 
 
 bash "change_dir" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
+    service mysql stop
     service apparmor stop
     sed 's:/var/lib/mysql:/data/mysql:g' -i /etc/apparmor.d/usr.sbin.mysqld
     mv /var/lib/mysql /data
