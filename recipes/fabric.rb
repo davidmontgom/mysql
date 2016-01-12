@@ -28,7 +28,7 @@ bash "install_fabric" do
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/fabric.lock")}
 end
 
-
+=begin
 bash "install_fabric" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
@@ -56,7 +56,7 @@ EOH
   action :run
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/fabric_users.lock")}
 end
-
+=end
 
 
 template "/etc/mysql/fabric.cfg" do
