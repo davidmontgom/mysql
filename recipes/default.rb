@@ -136,22 +136,22 @@ bash "install_fabric_user" do
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
   
-    echo "CREATE USER 'fabric_store'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
-    echo "GRANT ALTER, CREATE, CREATE VIEW, DELETE, DROP, EVENT, INDEX, INSERT, REFERENCES, SELECT, UPDATE ON mysql_fabric.* TO 'fabric_store'@'%';" | mysql -u root -pTest101
-    echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101
+    echo "CREATE USER 'fabric_store'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -p#{password}
+    echo "GRANT ALTER, CREATE, CREATE VIEW, DELETE, DROP, EVENT, INDEX, INSERT, REFERENCES, SELECT, UPDATE ON mysql_fabric.* TO 'fabric_store'@'%';" | mysql -u root -p#{password}
+    echo "FLUSH PRIVILEGES;" | mysql -u root -p#{password}
     
-    echo "CREATE USER 'fabric_server'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
-    echo "GRANT DELETE, PROCESS, RELOAD, REPLICATION CLIENT, REPLICATION SLAVE, SELECT, SUPER, TRIGGER ON *.* TO 'fabric_server'@'%';" | mysql -u root -pTest101
-    echo "GRANT ALTER, CREATE, DELETE, DROP, INSERT, SELECT, UPDATE ON mysql_fabric.* TO 'fabric_server'@'%';" | mysql -u root -pTest101
-    echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101 
+    echo "CREATE USER 'fabric_server'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -p#{password}
+    echo "GRANT DELETE, PROCESS, RELOAD, REPLICATION CLIENT, REPLICATION SLAVE, SELECT, SUPER, TRIGGER ON *.* TO 'fabric_server'@'%';" | mysql -u root -p#{password}
+    echo "GRANT ALTER, CREATE, DELETE, DROP, INSERT, SELECT, UPDATE ON mysql_fabric.* TO 'fabric_server'@'%';" | mysql -u root -p#{password}
+    echo "FLUSH PRIVILEGES;" | mysql -u root -p#{password} 
     
-    echo "CREATE USER 'fabric_restore'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
-    echo "GRANT ALTER, ALTER ROUTINE, CREATE, CREATE ROUTINE, CREATE TABLESPACE, CREATE VIEW, DROP, EVENT, INSERT, LOCK TABLES, REFERENCES, SELECT, SUPER, TRIGGER ON *.* TO 'fabric_restore'@'%';" | mysql -u root -pTest101
-    echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101 
+    echo "CREATE USER 'fabric_restore'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -p#{password}
+    echo "GRANT ALTER, ALTER ROUTINE, CREATE, CREATE ROUTINE, CREATE TABLESPACE, CREATE VIEW, DROP, EVENT, INSERT, LOCK TABLES, REFERENCES, SELECT, SUPER, TRIGGER ON *.* TO 'fabric_restore'@'%';" | mysql -u root -p#{password}
+    echo "FLUSH PRIVILEGES;" | mysql -u root -p#{password} 
     
-    echo "CREATE USER 'fabric_backup'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
-    echo "GRANT EVENT, EXECUTE, REFERENCES, SELECT, SHOW VIEW, TRIGGER ON *.* TO 'fabric_backup'@'%';" | mysql -u root -pTest101
-    echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101 
+    echo "CREATE USER 'fabric_backup'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -p#{password}
+    echo "GRANT EVENT, EXECUTE, REFERENCES, SELECT, SHOW VIEW, TRIGGER ON *.* TO 'fabric_backup'@'%';" | mysql -u root -p#{password}
+    echo "FLUSH PRIVILEGES;" | mysql -u root -p#{password}
     
     touch #{Chef::Config[:file_cache_path]}/fabric_users.lock
 EOH
