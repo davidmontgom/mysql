@@ -86,6 +86,20 @@ template "/etc/supervisor/conf.d/fabric.conf" do
 end
 
 =begin
+
+For app servers use python connector to connect to fabric servers
+For Druid create primary DNS
+write script that will create primary DNS with current 
+if primary fails then do update the primary DNS with new primary ip address
+
+Fabric will be manually maitained
+
+
+n
+
+
+http://dev.mysql.com/doc/mysql-utilities/1.5/en/fabric-faq.html
+https://blogs.oracle.com/jbalint/entry/accessing_fabric_ha_groups_from
 https://dev.mysql.com/tech-resources/articles/mysql-fabric-ga.html
 mysqlfabric manage setup --param=storage.user=fabric
 mysqlfabric group create druid
