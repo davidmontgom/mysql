@@ -70,6 +70,10 @@ bash "change_dir" do
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/apparmor.lock")}
 end
 
+service "mysql" do
+  supports :start => true, :stop => true
+end
+
     
 if server_type == "mysql"
   cluster_index = File.read("/var/cluster_index.txt")
