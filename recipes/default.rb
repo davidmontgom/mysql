@@ -115,6 +115,7 @@ bash "add_user" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
+    service mysql start
     echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '#{password}';" | mysql -u root -p#{password}
     echo "grant all privileges on *.* to 'root'@'%' identified by '#{password}';" | mysql -u root -p#{password}
     echo "FLUSH PRIVILEGES;" | mysql -u root -p#{password}
