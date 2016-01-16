@@ -23,7 +23,7 @@ restore_password = <%= @password %>
 unreachable_timeout = 5
 
 [protocol.xmlrpc]
-address = localhost:32274
+address = 0.0.0.0:32274
 threads = 5
 user = admin
 password = <%= @password %>
@@ -34,7 +34,7 @@ ssl_cert =
 ssl_key = 
 
 [protocol.mysql]
-address = localhost:32275
+address = 0.0.0.0:32275
 user = admin
 password = <%= @password %>
 disable_authentication = no
