@@ -83,7 +83,7 @@ end
 
 
 execute "restart_supervisorctl_fabric" do
-  command "sudo supervisorctl restart fabric_server:"
+  command "mysqlfabric manage stop;supervisorctl restart fabric_server:"
   action :nothing
 end
 
