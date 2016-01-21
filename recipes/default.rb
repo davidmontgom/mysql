@@ -108,6 +108,7 @@ if server_type == "mysql"
     mode "0644"
     notifies :start, resources(:service => "mysql")
     variables :cluster_index => cluster_index
+    ignore_failure :true
     only_if {File.exists?("/var/cluster_index.txt")}
   end
 end
