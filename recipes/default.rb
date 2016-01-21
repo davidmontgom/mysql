@@ -84,7 +84,7 @@ File.exists?("/var/cluster_index.txt")
 else
    cluster_index = 0
 =end
-
+=begin
 if server_type == "mysql"
   #cluster_index = File.read("/var/cluster_index.txt")
   #cluster_index = cluster_index.gsub(/\n/, "") 
@@ -110,6 +110,16 @@ if server_type == "mysql"
     not_if {File.exists?("/var/cluster_index.txt")}
   end
 end
+=end
+template "/etc/mysql/my.cnf" do
+    path "/etc/mysql/my.cnf"
+    source "my.5.7.standalone.cnf.erb"
+    owner "root"
+    group "root"
+    mode "0644"
+    notifies :start, resources(:service => "mysql")
+    #not_if {File.exists?("/var/cluster_index.txt")}
+  end
 
 if server_type == "fabric"
   template "/etc/mysql/my.cnf" do
