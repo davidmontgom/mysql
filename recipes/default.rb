@@ -77,18 +77,38 @@ service "mysql" do
   supports :start => true, :stop => true
 end
 
-    
-if server_type == "mysql"
+=begin
+File.exists?("/var/cluster_index.txt") 
   cluster_index = File.read("/var/cluster_index.txt")
   cluster_index = cluster_index.gsub(/\n/, "") 
+else
+   cluster_index = 0
+=end
+
+if server_type == "mysql"
+  #cluster_index = File.read("/var/cluster_index.txt")
+  #cluster_index = cluster_index.gsub(/\n/, "") 
   template "/etc/mysql/my.cnf" do
     path "/etc/mysql/my.cnf"
-    source "my.5.7.cnf.erb"
+    source "my.5.7.index.cnf.erb"
+    owner "root"
+    group "root"
+    mode "0644"
+    notifies :start, resources(:service => "mysql")
+    #variables :cluster_index => cluster_index
+    variables :cluster_index => File.read("/var/cluster_index.txt").gsub(/\n/, "") 
+    only_if {File.exists?("/var/cluster_index.txt")}
+  end
+  
+  template "/etc/mysql/my.cnf" do
+    path "/etc/mysql/my.cnf"
+    source "my.5.7.standalone.cnf.erb"
     owner "root"
     group "root"
     mode "0644"
     notifies :start, resources(:service => "mysql")
     variables :cluster_index => cluster_index
+    not_if {File.exists?("/var/cluster_index.txt")}
   end
 end
 

@@ -15,3 +15,6 @@ mysqlfabric group add druid 198.211.97.48:3306
 mysqlfabric group promote druid
 mysqlfabric group health druid
 mysqlfabric group lookup_servers druid
+
+
+mysqlfabric group remove druid 208.68.38.140:3306
