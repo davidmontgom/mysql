@@ -84,10 +84,10 @@ File.exists?("/var/cluster_index.txt")
 else
    cluster_index = 0
 =end
-=begin
+
 if server_type == "mysql"
-  #cluster_index = File.read("/var/cluster_index.txt")
-  #cluster_index = cluster_index.gsub(/\n/, "") 
+  cluster_index = File.read("/var/cluster_index.txt")
+  cluster_index = cluster_index.gsub(/\n/, "") 
   template "/etc/mysql/my.cnf" do
     path "/etc/mysql/my.cnf"
     source "my.5.7.index.cnf.erb"
@@ -95,11 +95,11 @@ if server_type == "mysql"
     group "root"
     mode "0644"
     notifies :start, resources(:service => "mysql")
-    #variables :cluster_index => cluster_index
-    variables lazy {{:cluster_index => File.read("/var/cluster_index.txt").gsub(/\n/, "")}}
-    only_if {File.exists?("/var/cluster_index.txt")}
+    variables :cluster_index => cluster_index
+    #variables {{:cluster_index => File.read("/var/cluster_index.txt").gsub(/\n/, "")}}
+    #only_if {File.exists?("/var/cluster_index.txt")}
   end
-  
+=begin
   template "/etc/mysql/my.cnf" do
     path "/etc/mysql/my.cnf"
     source "my.5.7.standalone.cnf.erb"
@@ -109,17 +109,10 @@ if server_type == "mysql"
     notifies :start, resources(:service => "mysql")
     not_if {File.exists?("/var/cluster_index.txt")}
   end
-end
 =end
-template "/etc/mysql/my.cnf" do
-    path "/etc/mysql/my.cnf"
-    source "my.5.7.standalone.cnf.erb"
-    owner "root"
-    group "root"
-    mode "0644"
-    notifies :start, resources(:service => "mysql")
-    #not_if {File.exists?("/var/cluster_index.txt")}
-  end
+end
+
+
 
 if server_type == "fabric"
   template "/etc/mysql/my.cnf" do
@@ -138,15 +131,18 @@ service "mysql" do
   action [ :enable, :start]
 end
 
-
-
+=begin
+grant all privileges on *.* to 'root'@'%' with grant option;
+CREATE DATABASE druid DEFAULT CHARACTER SET utf8;
+CREATE USER 'druid'@'%' IDENTIFIED BY 'diurd';
+=end
 bash "add_user" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
     service mysql start
     echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '#{password}';" | mysql -u root -p#{password}
-    echo "grant all privileges on *.* to 'root'@'%' identified by '#{password}';" | mysql -u root -p#{password}
+    echo "grant all privileges on *.* to 'root'@'%' with grant option identified by '#{password}';" | mysql -u root -p#{password}
     echo "FLUSH PRIVILEGES;" | mysql -u root -p#{password}
     touch #{Chef::Config[:file_cache_path]}/mysql_user.lock
   EOH
