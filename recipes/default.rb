@@ -96,8 +96,8 @@ if server_type == "mysql"
     mode "0644"
     notifies :start, resources(:service => "mysql")
     #variables :cluster_index => cluster_index
-    variables :cluster_index => File.read("/var/cluster_index.txt").gsub(/\n/, "")
-    not_if {File.exists?("/var/cluster_index.txt")}
+    variables lazy {{:cluster_index => File.read("/var/cluster_index.txt").gsub(/\n/, "")}}
+    only_if {File.exists?("/var/cluster_index.txt")}
   end
   
   template "/etc/mysql/my.cnf" do
@@ -109,7 +109,7 @@ if server_type == "mysql"
     notifies :start, resources(:service => "mysql")
     variables :cluster_index => cluster_index
     ignore_failure :true
-    only_if {File.exists?("/var/cluster_index.txt")}
+    not_if {File.exists?("/var/cluster_index.txt")}
   end
 end
 
