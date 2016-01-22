@@ -11,10 +11,15 @@ https://blogs.oracle.com/jbalint/entry/accessing_fabric_ha_groups_from
 https://dev.mysql.com/tech-resources/articles/mysql-fabric-ga.html
 mysqlfabric manage setup --param=storage.user=fabric
 mysqlfabric group create druid
-mysqlfabric group add druid 198.211.97.48:3306
+mysqlfabric group add druid 192.34.59.251:3306
 mysqlfabric group promote druid
 mysqlfabric group health druid
 mysqlfabric group lookup_servers druid
 
 
-mysqlfabric group remove druid 208.68.38.140:3306
+master mysqlfabric group remove druid 208.68.38.219:3306
+slave mysqlfabric group remove druid 192.34.59.251:3306
+
+master mysqlfabric group add druid 208.68.38.219:3306
+mysqlfabric group promote druid
+slave mysqlfabric group add druid 192.34.59.251:3306
