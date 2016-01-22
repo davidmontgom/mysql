@@ -33,17 +33,20 @@ directory "/data/mysql" do
 end
 =end
 
+=begin
 cookbook_file "#{Chef::Config[:file_cache_path]}/pubkey_mysql.asc" do
   source "pubkey_mysql.asc"
   mode 00544
 end
+=end
 
 bash "install_mysql" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
-    #gpg --recv-keys 5072E1F5
-    #gpg --export -a 5072e1f5 > pubkey_mysql.asc
+    gpg --recv-keys 5072E1F5  
+    gpg --recv-keys 5072E1F5   
+    gpg --export -a 5072e1f5 > pubkey_mysql.asc
     sudo apt-key add pubkey_mysql.asc
     echo 'deb http://repo.mysql.com/apt/ubuntu trusty mysql-5.7' | tee -a /etc/apt/sources.list.d/mysql.list
     sudo apt-get update
@@ -136,6 +139,8 @@ grant all privileges on *.* to 'root'@'%' with grant option;
 CREATE DATABASE druid DEFAULT CHARACTER SET utf8;
 CREATE USER 'druid'@'%' IDENTIFIED BY 'diurd';
 =end
+
+=begin
 bash "add_user" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
@@ -149,6 +154,7 @@ bash "add_user" do
   action :run
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql_user.lock")}
 end
+=end
 
 =begin
 echo "ALTER USER 'root'@'localhost' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
@@ -156,7 +162,7 @@ echo "grant all privileges on *.* to 'root'@'%' identified by 'Test101';" | mysq
 echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101
 =end
 
-
+=begin
 bash "install_fabric_user" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
@@ -185,4 +191,4 @@ EOH
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/fabric_users.lock")}
 end
 
-
+=end
