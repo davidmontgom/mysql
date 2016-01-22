@@ -70,7 +70,7 @@ bash "change_dir" do
     sed 's:/var/lib/mysql:/data/mysql:g' -i /etc/apparmor.d/usr.sbin.mysqld
     mv /var/lib/mysql /data
     service apparmor start
-    service mysql start
+    
     touch #{Chef::Config[:file_cache_path]}/apparmor.lock
   EOH
   action :run
@@ -151,6 +151,7 @@ bash "add_user" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
+    service mysql start
     echo "grant all privileges on *.* to 'root'@'%' with grant option;" | mysql -u root
     echo "ALTER USER 'root'@'localhost';grant all privileges on *.* to 'root'@'%' identified by 'Test101';FLUSH PRIVILEGES;" | mysql -u root
     touch #{Chef::Config[:file_cache_path]}/mysql_user.lock
