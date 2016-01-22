@@ -70,6 +70,7 @@ bash "change_dir" do
     sed 's:/var/lib/mysql:/data/mysql:g' -i /etc/apparmor.d/usr.sbin.mysqld
     mv /var/lib/mysql /data
     service apparmor start
+    service mysql start
     touch #{Chef::Config[:file_cache_path]}/apparmor.lock
   EOH
   action :run
@@ -135,26 +136,29 @@ service "mysql" do
 end
 
 =begin
+echo "grant all privileges on *.* to 'root'@'%' with grant option;" | mysql -u root
+echo "ALTER USER 'root'@'localhost';grant all privileges on *.* to 'root'@'%' identified by 'Test101';FLUSH PRIVILEGES;" | mysql -u root
+
+
+
 grant all privileges on *.* to 'root'@'%' with grant option;
 CREATE DATABASE druid DEFAULT CHARACTER SET utf8;
 CREATE USER 'druid'@'%' IDENTIFIED BY 'diurd';
 =end
 
-=begin
+
 bash "add_user" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
-    service mysql start
-    echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '#{password}';" | mysql -u root -p#{password}
-    echo "grant all privileges on *.* to 'root'@'%' with grant option identified by '#{password}';" | mysql -u root -p#{password}
-    echo "FLUSH PRIVILEGES;" | mysql -u root -p#{password}
+    echo "grant all privileges on *.* to 'root'@'%' with grant option;" | mysql -u root
+    echo "ALTER USER 'root'@'localhost';grant all privileges on *.* to 'root'@'%' identified by 'Test101';FLUSH PRIVILEGES;" | mysql -u root
     touch #{Chef::Config[:file_cache_path]}/mysql_user.lock
   EOH
   action :run
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql_user.lock")}
 end
-=end
+
 
 =begin
 echo "ALTER USER 'root'@'localhost' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
@@ -162,7 +166,7 @@ echo "grant all privileges on *.* to 'root'@'%' identified by 'Test101';" | mysq
 echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101
 =end
 
-=begin
+
 bash "install_fabric_user" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
@@ -191,4 +195,4 @@ EOH
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/fabric_users.lock")}
 end
 
-=end
+
