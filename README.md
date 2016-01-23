@@ -20,6 +20,10 @@ mysqlfabric group lookup_servers druid
 master mysqlfabric group remove druid 208.68.38.219:3306
 slave mysqlfabric group remove druid 192.34.59.251:3306
 
-master mysqlfabric group add druid 208.68.38.219:3306
+mysqlfabric group add druid 192.34.59.181:3306
+mysqlfabric group add druid 192.34.56.66:3306
+
 mysqlfabric group promote druid
-slave mysqlfabric group add druid 192.34.59.251:3306
+
+
+https://github.com/druid-io/druid/issues/1701

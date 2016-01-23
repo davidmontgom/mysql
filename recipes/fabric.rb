@@ -61,7 +61,7 @@ bash "init_fabric" do
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
     mysqlfabric manage setup --param=storage.user=fabric
-    mysqlfabric manage stop
+    mysqlfabric manage start --daemon
     touch #{Chef::Config[:file_cache_path]}/fabric_init.lock
   EOH
   action :run
@@ -70,6 +70,9 @@ end
 
 
 
+
+
+=begin
 execute "restart_supervisorctl_fabric" do
   command "mysqlfabric manage stop;supervisorctl restart fabric_server:"
   action :nothing
@@ -84,6 +87,7 @@ template "/etc/supervisor/conf.d/fabric.conf" do
   #notifies :restart, resources(:service => "supervisord")
   notifies :run, "execute[restart_supervisorctl_fabric]"
 end
+=end
 
 =begin
 
