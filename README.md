@@ -21,7 +21,12 @@ mysqlfabric group health druid
 mysqlfabric group lookup_servers druid
 
 
-master mysqlfabric group remove druid 208.68.38.219:3306
+mysqlfabric group add druid 192.34.58.37:3306
+mysqlfabric group add druid 192.34.56.199:3306
+
+
+
+
 slave mysqlfabric group remove druid 192.34.59.251:3306
 
 mysqlfabric group remove druid 192.34.59.181:3306
@@ -31,3 +36,31 @@ mysqlfabric group promote druid
 
 
 https://github.com/druid-io/druid/issues/1701
+
+drop user fabric_server;
+flush privileges;
+CREATE USER 'fabric_server'@'%' IDENTIFIED BY 'Test101';
+grant all on *.* to 'fabric_server'@'%' identified by 'Test101';
+
+
+
+
+
+http://bugs.mysql.com/bug.php?id=72281
+https://www.percona.com/blog/2014/05/15/high-availability-mysql-fabric-part/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

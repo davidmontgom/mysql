@@ -4,7 +4,7 @@ sysconfdir = /usr/local/etc
 logdir = /var/log
 
 [storage]
-address = 0.0.0.0:3306
+address = <%=node[:ipaddress]%>:3306
 user = fabric_store 
 password = <%= @password %>
 database = mysql_fabric
@@ -23,7 +23,7 @@ restore_password = <%= @password %>
 unreachable_timeout = 5
 
 [protocol.xmlrpc]
-address = 0.0.0.0:32274
+address = <%=node[:ipaddress]%>:32274
 threads = 5
 user = admin
 password = <%= @password %>
