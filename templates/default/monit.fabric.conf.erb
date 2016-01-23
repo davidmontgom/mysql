@@ -1,5 +1,5 @@
-#monit procmatch ".*/usr/bin/python /usr/bin/mysqlfabric manage start.*"
+#monit procmatch ".*/usr/bin/python /usr/bin/mysqlfabric manage start --daemon.*"
 check process fabric
 	with matching ".*/usr/bin/python /usr/bin/mysqlfabric manage start.*"
-	start program = "/usr/bin/mysqlfabric manage start"
+	start program = "/usr/bin/mysqlfabric manage start --daemon"
 	stop program = "/usr/bin/mysqlfabric manage stop"
