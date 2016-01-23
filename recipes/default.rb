@@ -145,7 +145,7 @@ bash "add_user" do
     echo "grant all on *.* to 'root'@'%' with grant option;" | mysql -u root
     echo "FLUSH PRIVILEGES;" | mysql -u root
     
-    echo "drop user 'root'@'localhost';" | mysql -u root -pTest101
+    echo "SET sql_log_bin = 0; drop user 'root'@'localhost';" | mysql -u root -pTest101
     echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101
     echo "SET sql_log_bin = 1;" | mysql -u root -pTest101
     
