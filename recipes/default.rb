@@ -162,9 +162,10 @@ bash "install_fabric_user" do
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
   
-    echo "CREATE USER 'fabric_server'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
+    echo "SET sql_log_bin = 0; CREATE USER 'fabric_server'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
     echo "grant all on *.* to 'fabric_server'@'%' with grant option;" | mysql -u root -pTest101
     echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101 
+    echo "SET sql_log_bin = 1;" | mysql -u root -pTest101
     
     echo "CREATE USER 'fabric_restore'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
     echo "GRANT ALTER, ALTER ROUTINE, CREATE, CREATE ROUTINE, CREATE TABLESPACE, CREATE VIEW, DROP, EVENT, INSERT, LOCK TABLES, REFERENCES, SELECT, SUPER, TRIGGER ON *.* TO 'fabric_restore'@'%';" | mysql -u root -pTest101
