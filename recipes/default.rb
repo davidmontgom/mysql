@@ -140,13 +140,14 @@ bash "add_user" do
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
     service mysql start
-    echo "CREATE USER 'root'@'%' identified by 'Test101';" | mysql -u root
+    echo "SET sql_log_bin = 0; CREATE USER 'root'@'%' identified by 'Test101';" | mysql -u root
     echo "ALTER USER 'root'@'%' identified by 'Test101';" | mysql -u root
     echo "grant all on *.* to 'root'@'%' with grant option;" | mysql -u root
     echo "FLUSH PRIVILEGES;" | mysql -u root
     
     echo "drop user 'root'@'localhost';" | mysql -u root -pTest101
     echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101
+    echo "SET sql_log_bin = 1;" | mysql -u root -pTest101
     
     touch #{Chef::Config[:file_cache_path]}/mysql_user.lock
   EOH
@@ -167,17 +168,20 @@ bash "install_fabric_user" do
     echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101 
     echo "SET sql_log_bin = 1;" | mysql -u root -pTest101
     
-    echo "CREATE USER 'fabric_restore'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
+    echo "SET sql_log_bin = 0; CREATE USER 'fabric_restore'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
     echo "GRANT ALTER, ALTER ROUTINE, CREATE, CREATE ROUTINE, CREATE TABLESPACE, CREATE VIEW, DROP, EVENT, INSERT, LOCK TABLES, REFERENCES, SELECT, SUPER, TRIGGER ON *.* TO 'fabric_restore'@'%';" | mysql -u root -pTest101
     echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101 
+    echo "SET sql_log_bin = 1;" | mysql -u root -pTest101
     
-    echo "CREATE USER 'fabric_backup'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
+    echo "SET sql_log_bin = 0; CREATE USER 'fabric_backup'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
     echo "GRANT EVENT, EXECUTE, REFERENCES, SELECT, SHOW VIEW, TRIGGER ON *.* TO 'fabric_backup'@'%';" | mysql -u root -pTest101
     echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101
+    echo "SET sql_log_bin = 1;" | mysql -u root -pTest101
     
-    echo "SET sql_log_bin = 0; CREATE USER 'fabric'@'%s' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
+    echo "SET sql_log_bin = 0; SET sql_log_bin = 0; CREATE USER 'fabric'@'%s' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
     echo "GRANT ALL ON *.* TO 'fabric'@'%s';" | mysql -u root -pTest101
     echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101
+    echo "SET sql_log_bin = 1;" | mysql -u root -pTest101
     echo "SET sql_log_bin = 1;" | mysql -u root -pTest101
     
     touch #{Chef::Config[:file_cache_path]}/fabric_users.lock
