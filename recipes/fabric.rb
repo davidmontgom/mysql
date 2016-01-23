@@ -23,7 +23,7 @@ bash "install_fabric_user" do
     touch #{Chef::Config[:file_cache_path]}/fabric_user_store.lock
 EOH
   action :run
-  not_if {File.exists?("#{Chef::Config[:file_cache_path]}/fabric_users.lock")}
+  not_if {File.exists?("#{Chef::Config[:file_cache_path]}/fabric_user_store.lock")}
 end
 
 
