@@ -16,11 +16,11 @@ bash "install_fabric_user" do
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
   
-    echo "CREATE USER 'fabric_store'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -p#{password}
-    echo "GRANT ALTER, CREATE, CREATE VIEW, DELETE, DROP, EVENT, INDEX, INSERT, REFERENCES, SELECT, UPDATE ON mysql_fabric.* TO 'fabric_store'@'%';" | mysql -u root -p#{password}
-    echo "FLUSH PRIVILEGES;" | mysql -u root -p#{password}
+    echo "CREATE USER 'fabric_store'@'%' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
+    echo "GRANT ALTER, CREATE, CREATE VIEW, DELETE, DROP, EVENT, INDEX, INSERT, REFERENCES, SELECT, UPDATE ON mysql_fabric.* TO 'fabric_store'@'%';" | mysql -u root -pTest101
+    echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101
     
-    touch #{Chef::Config[:file_cache_path]}/fabric_users.lock
+    touch #{Chef::Config[:file_cache_path]}/fabric_user_store.lock
 EOH
   action :run
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/fabric_users.lock")}
