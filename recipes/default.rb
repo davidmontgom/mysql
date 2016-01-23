@@ -70,7 +70,6 @@ bash "change_dir" do
     sed 's:/var/lib/mysql:/data/mysql:g' -i /etc/apparmor.d/usr.sbin.mysqld
     mv /var/lib/mysql /data
     service apparmor start
-    
     touch #{Chef::Config[:file_cache_path]}/apparmor.lock
   EOH
   action :run
@@ -135,6 +134,8 @@ service "mysql" do
   action [ :enable, :start]
 end
 
+
+
 =begin
 echo "grant all privileges on *.* to 'root'@'%' with grant option;" | mysql -u root
 echo "ALTER USER 'root'@'localhost';grant all privileges on *.* to 'root'@'%' identified by 'Test101';FLUSH PRIVILEGES;" | mysql -u root
@@ -146,29 +147,37 @@ CREATE DATABASE druid DEFAULT CHARACTER SET utf8;
 CREATE USER 'druid'@'%' IDENTIFIED BY 'diurd';
 =end
 
-
+=begin
 bash "add_user" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
     service mysql start
-    echo "grant all privileges on *.* to 'root'@'%' with grant option;" | mysql -u root
+    create user 'root'@'%' identified by 'Test101'
+    ALTER USER 'root'@'%' identified by 'Test101';
+    echo "grant all on *.* to 'root'@'%' with grant option;" | mysql -u root
     echo "ALTER USER 'root'@'localhost';grant all privileges on *.* to 'root'@'%' identified by 'Test101';FLUSH PRIVILEGES;" | mysql -u root
     touch #{Chef::Config[:file_cache_path]}/mysql_user.lock
   EOH
   action :run
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql_user.lock")}
 end
+=end
 
-
+#ALTER USER 'root'@'%' IDENTIFIED BY 'Test101';
 =begin
 echo "ALTER USER 'root'@'localhost' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
 echo "grant all privileges on *.* to 'root'@'%' identified by 'Test101';" | mysql -u root -pTest101
 echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101
 =end
 
+=begin
+ALTER USER 'fabric_server'@'%' IDENTIFIED BY 'Test101';
+GRANT ALL ON *.* TO 'fabric_server'@'%' IDENTIFIED BY 'Test101';
+FLUSH PRIVILEGES;
+=end
 
-
+=begin
 bash "install_fabric_user" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
@@ -192,6 +201,7 @@ EOH
   action :run
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/fabric_users.lock")}
 end
+=end
 
 
 

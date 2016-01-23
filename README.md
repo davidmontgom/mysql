@@ -4,6 +4,10 @@ Issues
 * In aws test if attachement exists
 * creating users did not work
 
+#issues with root privlages
+http://stackoverflow.com/questions/1709078/how-can-i-restore-the-mysql-root-user-s-full-privileges
+http://stackoverflow.com/questions/24027487/how-can-i-restore-the-mysql-root-user-s-full-privileges?rq=1
+
 
 https://dev.mysql.com/doc/mysql-utilities/1.5/en/connector-python-fabric.html
 http://dev.mysql.com/doc/mysql-utilities/1.5/en/fabric-faq.html
@@ -20,7 +24,7 @@ mysqlfabric group lookup_servers druid
 master mysqlfabric group remove druid 208.68.38.219:3306
 slave mysqlfabric group remove druid 192.34.59.251:3306
 
-mysqlfabric group add druid 192.34.59.181:3306
+mysqlfabric group remove druid 192.34.59.181:3306
 mysqlfabric group add druid 192.34.56.66:3306
 
 mysqlfabric group promote druid
