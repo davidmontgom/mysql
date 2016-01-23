@@ -175,9 +175,10 @@ bash "install_fabric_user" do
     echo "GRANT EVENT, EXECUTE, REFERENCES, SELECT, SHOW VIEW, TRIGGER ON *.* TO 'fabric_backup'@'%';" | mysql -u root -pTest101
     echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101
     
-    echo "CREATE USER 'fabric'@'%s' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
+    echo "SET sql_log_bin = 0; CREATE USER 'fabric'@'%s' IDENTIFIED BY 'Test101';" | mysql -u root -pTest101
     echo "GRANT ALL ON *.* TO 'fabric'@'%s';" | mysql -u root -pTest101
     echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101
+    echo "SET sql_log_bin = 1;" | mysql -u root -pTest101
     
     touch #{Chef::Config[:file_cache_path]}/fabric_users.lock
 EOH
