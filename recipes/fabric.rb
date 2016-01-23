@@ -65,7 +65,7 @@ bash "init_fabric" do
     touch #{Chef::Config[:file_cache_path]}/fabric_init.lock
   EOH
   action :run
-  not_if {File.exists?("#{Chef::Config[:file_cache_path]}/fabric.lock")}
+  not_if {File.exists?("#{Chef::Config[:file_cache_path]}/fabric_init.lock")}
 end
 
 
