@@ -10,9 +10,6 @@ data_bag("server_data_bag")
 fabric_server = data_bag_item("server_data_bag", server_type)
 password = fabric_server[datacenter][environment][location][cluster_slug]['meta']['password']
 
-easy_install_package "dnspython" do
-  action :install
-end
 
 #http://dev.mysql.com/doc/mysql-utilities/1.5/en/fabric.html
 bash "install_fabric_user" do

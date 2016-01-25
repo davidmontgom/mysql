@@ -1,0 +1,4 @@
+check process fabric-service
+  	with matching "/usr/bin/python /var/fabric_add_servers_monitor.py"
+	start program = "/usr/local/bin/supervisorctl start fabric_service_server:"
+	stop program = "/usr/local/bin/supervisorctl stop fabric_service_server:"

@@ -54,15 +54,13 @@ with open('%s/meta_data_bag/aws.json' % (settings_path.rstrip('/'))) as data_fil
 domain = aws[environment]['route53']['domain']
 zone_id = aws[environment]['route53']['zone_id']
 
-if os.path.isfile('/var/cluster_slug/.txt'):
+if os.path.isfile('/var/cluster_slug.txt'):
     cluster_slug = open("/var/cluster_slug.txt").readlines()[0].strip()
 else:
     cluster_slug = "nocluster"
 
 
 #output = ['Fabric UUID:  5ca1ab1e-a007-feed-f00d-cab3fe13249e\n', 'Time-To-Live: 1\n', '\n', '                         server_uuid            address    status       mode weight\n', '------------------------------------ ------------------ --------- ---------- ------\n', '8af1be99-c191-11e5-8949-04019e3fc401  192.34.58.37:3306   PRIMARY READ_WRITE    1.0\n', 'bb14bc32-c18f-11e5-b823-04019e3f1b01 192.34.56.199:3306 SECONDARY  READ_ONLY    1.0\n', '\n', '\n']
-
-
 
 def get_zk_host_list():
     zk_host_list_dns = open('/var/zookeeper_hosts.json').readlines()[0]
@@ -97,11 +95,10 @@ zk = None
 while zk==None:
     zk = get_zk_conn()
     
-
 def create_domain(subdomain,ip_address,ttl=60,weight=None,identifier=None,region=None):
 
-        domain = parms['aws'][environment]['route53']['domain']
-        zone_id = parms['aws'][environment]['route53']['zone_id']
+        domain = aws[environment]['route53']['domain']
+        zone_id = aws[environment]['route53']['zone_id']
         
         conn = Route53Connection(aws_access_key_id, aws_secret_access_key)
         changes = ResourceRecordSets(conn, zone_id)
@@ -113,8 +110,8 @@ def create_domain(subdomain,ip_address,ttl=60,weight=None,identifier=None,region
 
 def update_domain(subdomain,ip_address_list=[],ttl=60,weight=None,identifier=None,region=None):
 
-        domain = parms['aws'][environment]['route53']['domain']
-        zone_id = parms['aws'][environment]['route53']['zone_id']
+        domain = aws[environment]['route53']['domain']
+        zone_id = aws[environment]['route53']['zone_id']
         
         conn = Route53Connection(aws_access_key_id, aws_secret_access_key)
         changes = ResourceRecordSets(conn, zone_id)
