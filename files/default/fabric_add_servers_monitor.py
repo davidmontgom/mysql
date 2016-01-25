@@ -157,15 +157,15 @@ while True:
     print 'primary_ip_address:',primary_ip_address  
     print 'secondary_ip_list:',secondary_ip_list
     
-    
-    druid_primary_host = get_druid_primary()
-    print 'druid_primary_host:',druid_primary_host
-    subdomain = 'primary-mysql-%s-%s-%s-%s-druid' % (slug,datacenter,environment,location)
-    if not druid_primary_host:
-        create_domain(subdomain,primary_ip_address,ttl=60,weight=None,identifier=None,region=None)
-    
-    if druid_primary_host != primary_ip_address:
-        update_domain(subdomain,ip_address_list=[primary_ip_address],ttl=60,weight=None,identifier=None,region=None)
+    if cluster_slug=='druid':
+        druid_primary_host = get_druid_primary()
+        print 'druid_primary_host:',druid_primary_host
+        subdomain = 'primary-mysql-%s-%s-%s-%s-druid' % (slug,datacenter,environment,location)
+        if not druid_primary_host:
+            create_domain(subdomain,primary_ip_address,ttl=60,weight=None,identifier=None,region=None)
+        
+        if druid_primary_host != primary_ip_address:
+            update_domain(subdomain,ip_address_list=[primary_ip_address],ttl=60,weight=None,identifier=None,region=None)
         
     #We know we have a new server when the node names do not match
     
