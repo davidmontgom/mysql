@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import paramiko
 import dns.resolver
 import hashlib
@@ -121,6 +122,15 @@ def update_domain(subdomain,ip_address_list=[],ttl=60,weight=None,identifier=Non
             change.add_value(str(ip_address))
         changes.commit()
         
+        
+def create_fabric_group():
+    
+    """
+    create fabric group if /var/chef/cache/druid.fabric.lock does not exists
+    """
+    
+    pass
+        
 def get_druid_primary():
     zk_host_list_dns = 'primary-mysql-%s-%s-%s-%s-druid.%s' % (slug,datacenter,environment,location,domain)
     zk_host_list_dns = zk_host_list_dns.split(',')
@@ -179,6 +189,10 @@ while True:
         res = zk.set(path, data)
     except:
         get_zk_conn()
+        
+    sys.stdout.flush()
+    sys.stderr.flush()
+    time.sleep(2)
         
     
     
