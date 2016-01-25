@@ -126,11 +126,26 @@ def update_domain(subdomain,ip_address_list=[],ttl=60,weight=None,identifier=Non
 def create_fabric_group():
     
     """
+    /var/chef/cache/zookeeper.ok
+    
     create fabric group if /var/chef/cache/druid.fabric.lock does not exists
     """
-    
-    pass
+    created = False
+    group_exists = False
+    cmd = "mysqlfabric group create %s" % cluster_slug
+    output = os.popen(cmd).readlines()
+    for out in output:
+        if out.find('GroupError: Group (%s) already exists.' % (cluster_slug))>=0:
+            group_exists = True
+        if out.find('Fabric UUID:')>=0:
+            group_exists = False
+            created = True
+            os.system('touch /var/chef/cache/%s.fabric.lock' % (cluster_slug))
+            
+    return group_exists
+  
         
+            
 def get_druid_primary():
     zk_host_list_dns = 'primary-mysql-%s-%s-%s-%s-druid.%s' % (slug,datacenter,environment,location,domain)
     zk_host_list_dns = zk_host_list_dns.split(',')
@@ -143,29 +158,53 @@ def get_druid_primary():
             print 'ERROR, dns.resolver.NXDOMAIN',aname
     return primary_host 
 
+        
+  
+"""
+On everyh cycle
+
+1) get all the mysql servers for the path
+2) chech to see if server is added 
+3) then add
+4) test to make sure this fabric node is the name as in /fabric-forex-druid
+    if not then this is a new node and masters must be added with thne servers in fabric-forex-druid
+
+
+"""
+
+
 while True:
     secondary_ip_list = None
     primary_ip_address = None 
     
-    try:
-        cmd = 'mysqlfabric group lookup_servers %s' % cluster_slug
-        output = os.popen(cmd).readlines()
-        primary_ip_address = None
-        secondary_ip_list = []
-        for out in output:
-            out = out.strip()
-            if out.find('PRIMARY')>=0:
-                temp = out.split(' ')
-                for t in temp:
-                    if t.find(':')>=0:
-                        primary_ip_address = t.split(':')[0].strip()
-            if out.find('SECONDARY')>=0:
-                temp = out.split(' ')
-                for t in temp:
-                    if t.find(':')>=0:
-                        secondary_ip_list.append(t.split(':')[0].strip())
-    except:
-        print 'fabric error'
+    if not os.path.exists('/var/chef/cache/%s.fabric.lock' % (cluster_slug)):      
+        create_fabric_group() 
+    else:
+        group_exists = True
+       
+    primary_ip_address = None
+    secondary_ip_list = [] 
+    
+    
+    if group_exists:
+        try:
+            cmd = 'mysqlfabric group lookup_servers %s' % cluster_slug
+            output = os.popen(cmd).readlines()
+          
+            for out in output:
+                out = out.strip()
+                if out.find('PRIMARY')>=0:
+                    temp = out.split(' ')
+                    for t in temp:
+                        if t.find(':')>=0:
+                            primary_ip_address = t.split(':')[0].strip()
+                if out.find('SECONDARY')>=0:
+                    temp = out.split(' ')
+                    for t in temp:
+                        if t.find(':')>=0:
+                            secondary_ip_list.append(t.split(':')[0].strip())
+        except:
+            print 'fabric error'
                      
     print 'primary_ip_address:',primary_ip_address  
     print 'secondary_ip_list:',secondary_ip_list
