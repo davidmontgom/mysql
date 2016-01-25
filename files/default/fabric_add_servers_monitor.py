@@ -144,27 +144,33 @@ def get_druid_primary():
     return primary_host 
 
 while True:
-    cmd = 'mysqlfabric group lookup_servers %s' % cluster_slug
-    output = os.popen(cmd).readlines()
-    primary_ip_address = None
-    secondary_ip_list = []
-    for out in output:
-        out = out.strip()
-        if out.find('PRIMARY')>=0:
-            temp = out.split(' ')
-            for t in temp:
-                if t.find(':')>=0:
-                    primary_ip_address = t.split(':')[0].strip()
-        if out.find('SECONDARY')>=0:
-            temp = out.split(' ')
-            for t in temp:
-                if t.find(':')>=0:
-                    secondary_ip_list.append(t.split(':')[0].strip())
+    secondary_ip_list = None
+    primary_ip_address = None 
+    
+    try:
+        cmd = 'mysqlfabric group lookup_servers %s' % cluster_slug
+        output = os.popen(cmd).readlines()
+        primary_ip_address = None
+        secondary_ip_list = []
+        for out in output:
+            out = out.strip()
+            if out.find('PRIMARY')>=0:
+                temp = out.split(' ')
+                for t in temp:
+                    if t.find(':')>=0:
+                        primary_ip_address = t.split(':')[0].strip()
+            if out.find('SECONDARY')>=0:
+                temp = out.split(' ')
+                for t in temp:
+                    if t.find(':')>=0:
+                        secondary_ip_list.append(t.split(':')[0].strip())
+    except:
+        print 'fabric error'
                      
     print 'primary_ip_address:',primary_ip_address  
     print 'secondary_ip_list:',secondary_ip_list
     
-    if cluster_slug=='druid':
+    if cluster_slug=='druid' and primary_ip_address:
         druid_primary_host = get_druid_primary()
         print 'druid_primary_host:',druid_primary_host
         subdomain = 'primary-mysql-%s-%s-%s-%s-druid' % (slug,datacenter,environment,location)
@@ -176,19 +182,20 @@ while True:
         
     #We know we have a new server when the node names do not match
     
-    try:
-        path = '/fabric-%s-%s/' % (slug,cluster_slug)
-        if zk.exists(path)==None:
-            zk.create(path,'', ephemeral=False)
-        data = {}
-        data['node_name']=node_name
-        data['primary_ip_address']=primary_ip_address
-        data['secondary_ip_list']=secondary_ip_list
-        data = json.dumps(data)
-        
-        res = zk.set(path, data)
-    except:
-        get_zk_conn()
+    if primary_ip_address and secondary_ip_list:
+        try:
+            path = '/fabric-%s-%s/' % (slug,cluster_slug)
+            if zk.exists(path)==None:
+                zk.create(path,'', ephemeral=False)
+            data = {}
+            data['node_name']=node_name
+            data['primary_ip_address']=primary_ip_address
+            data['secondary_ip_list']=secondary_ip_list
+            data = json.dumps(data)
+            
+            res = zk.set(path, data)
+        except:
+            get_zk_conn()
         
     sys.stdout.flush()
     sys.stderr.flush()
