@@ -171,19 +171,6 @@ def get_zk_mysql_servers():
         
     return ip_address_list
   
-"""
-On every cycle
-
-1) get all the mysql servers for the path
-2) chech to see if server is added 
-3) then add
-4) test to make sure this fabric node is the name as in /fabric-forex-druid
-    if not then this is a new node and masters must be added with thne servers in fabric-forex-druid
-
-
-"""
-
-
 
 while True:
     secondary_ip_list = None
