@@ -177,7 +177,7 @@ while True:
     primary_ip_address = None 
     
     if not os.path.exists('/var/chef/cache/%s.fabric.lock' % (cluster_slug)):      
-        create_fabric_group() 
+        group_exists = create_fabric_group() 
     else:
         group_exists = True
        
