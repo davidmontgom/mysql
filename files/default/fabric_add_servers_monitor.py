@@ -229,6 +229,10 @@ while True:
         if primary_ip_address==None:
             cmd = "mysqlfabric group promote %s" % (cluster_slug)
             output = os.popen(cmd).readlines()
+            cmd = "mysqlfabric group activate %s" % (cluster_slug)
+            output = os.popen(cmd).readlines()
+            
+            
             print output
         else:
             print "primary exists"
