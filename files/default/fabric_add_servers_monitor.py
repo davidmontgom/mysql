@@ -5,6 +5,8 @@ import paramiko
 import dns.resolver
 import hashlib
 import zc.zk
+import logging 
+logging.basicConfig()
 from kazoo.client import KazooClient
 import os
 from boto.route53.connection import Route53Connection
@@ -62,7 +64,7 @@ else:
 
 
 #output = ['Fabric UUID:  5ca1ab1e-a007-feed-f00d-cab3fe13249e\n', 'Time-To-Live: 1\n', '\n', '                         server_uuid            address    status       mode weight\n', '------------------------------------ ------------------ --------- ---------- ------\n', '8af1be99-c191-11e5-8949-04019e3fc401  192.34.58.37:3306   PRIMARY READ_WRITE    1.0\n', 'bb14bc32-c18f-11e5-b823-04019e3f1b01 192.34.56.199:3306 SECONDARY  READ_ONLY    1.0\n', '\n', '\n']
-
+#scp fabric_add_servers_monitor.py root@192.81.208.99:/var/fabric_test.py
 def get_zk_host_list():
     zk_host_list_dns = open('/var/zookeeper_hosts.json').readlines()[0]
     
@@ -121,14 +123,16 @@ def update_domain(subdomain,ip_address_list=[],ttl=60,weight=None,identifier=Non
         for ip_address in ip_address_list:
             change.add_value(str(ip_address))
         changes.commit()
-        
-        
+             
 def create_fabric_group():
     
     """
     /var/chef/cache/zookeeper.ok
     
     create fabric group if /var/chef/cache/druid.fabric.lock does not exists
+    
+    
+    mysqlfabric group activate druid
     """
     created = False
     group_exists = False
@@ -143,10 +147,9 @@ def create_fabric_group():
             os.system('touch /var/chef/cache/%s.fabric.lock' % (cluster_slug))
             
     return group_exists
-  
-        
-            
+           
 def get_druid_primary():
+    
     zk_host_list_dns = 'primary-mysql-%s-%s-%s-%s-druid.%s' % (slug,datacenter,environment,location,domain)
     zk_host_list_dns = zk_host_list_dns.split(',')
     primary_host = None
@@ -158,10 +161,18 @@ def get_druid_primary():
             print 'ERROR, dns.resolver.NXDOMAIN',aname
     return primary_host 
 
+def get_zk_mysql_servers():   
+    
+    ip_address_list = [] 
+    path = '/mysql-%s-%s-%s-%s-%s/' % (slug,datacenter,environment,location,cluster_slug)
+    if zk.exists(path):
+        addresses = zk.get_children(path)
+        ip_address_list = list(set(addresses))
         
+    return ip_address_list
   
 """
-On everyh cycle
+On every cycle
 
 1) get all the mysql servers for the path
 2) chech to see if server is added 
@@ -171,6 +182,7 @@ On everyh cycle
 
 
 """
+
 
 
 while True:
@@ -184,6 +196,8 @@ while True:
        
     primary_ip_address = None
     secondary_ip_list = [] 
+    
+    zk_mysql_servers = get_zk_mysql_servers()
     
     
     if group_exists:
@@ -205,10 +219,33 @@ while True:
                             secondary_ip_list.append(t.split(':')[0].strip())
         except:
             print 'fabric error'
-                     
+    
+    if primary_ip_address:
+        fabric_mysql_servers = secondary_ip_list + [primary_ip_address]
+    else:
+        fabric_mysql_servers = secondary_ip_list
+        
     print 'primary_ip_address:',primary_ip_address  
     print 'secondary_ip_list:',secondary_ip_list
+    print 'fabric_servers:', fabric_mysql_servers
+    print 'zk_mysql_servers:',zk_mysql_servers
     
+    new_mysql_servers = []
+    for mysql in zk_mysql_servers:
+        if mysql not in fabric_mysql_servers:
+            new_mysql_servers.append(mysql)
+    
+    print 'new_mysql_servers:',new_mysql_servers
+    for mysql in new_mysql_servers:
+        cmd = "mysqlfabric group add %s %s:3306" % (cluster_slug,mysql)
+        output = os.popen(cmd).readlines()
+        if primary_ip_address==None:
+            cmd = "mysqlfabric group promote %s" % (cluster_slug)
+            output = os.popen(cmd).readlines()
+            print output
+        else:
+            print "primary exists"
+
     if cluster_slug=='druid' and primary_ip_address:
         druid_primary_host = get_druid_primary()
         print 'druid_primary_host:',druid_primary_host
