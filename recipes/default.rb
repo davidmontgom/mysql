@@ -66,7 +66,8 @@ bash "change_dir" do
     service mysql stop
     service apparmor stop
     sed 's:/var/lib/mysql:/data/mysql:g' -i /etc/apparmor.d/usr.sbin.mysqld
-    mv /var/lib/mysql /data
+    #mv /var/lib/mysql /data
+    [ -d /data/mysql ] && echo 'exists' || mv /var/lib/mysql /data 
     service apparmor start
     touch #{Chef::Config[:file_cache_path]}/apparmor.lock
   EOH
