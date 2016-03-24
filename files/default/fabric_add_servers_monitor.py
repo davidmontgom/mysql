@@ -32,6 +32,7 @@ if serves dies this is true
 HOME = os.path.expanduser("~")
 
 SETTINGS_FILE='%s/.bootops.yaml' % HOME.rstrip('/')
+SETTINGS_FILE='/root/.bootops.yaml'
 from yaml import load, dump
 from yaml import Loader, Dumper
 f = open(SETTINGS_FILE)
