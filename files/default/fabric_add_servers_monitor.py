@@ -66,27 +66,40 @@ else:
 #output = ['Fabric UUID:  5ca1ab1e-a007-feed-f00d-cab3fe13249e\n', 'Time-To-Live: 1\n', '\n', '                         server_uuid            address    status       mode weight\n', '------------------------------------ ------------------ --------- ---------- ------\n', '8af1be99-c191-11e5-8949-04019e3fc401  192.34.58.37:3306   PRIMARY READ_WRITE    1.0\n', 'bb14bc32-c18f-11e5-b823-04019e3f1b01 192.34.56.199:3306 SECONDARY  READ_ONLY    1.0\n', '\n', '\n']
 #scp fabric_add_servers_monitor.py root@192.81.208.99:/var/fabric_test.py
 def get_zk_host_list():
-    zk_host_list_dns = open('/var/zookeeper_hosts.json').readlines()[0]
     
-    zk_host_list_dns = zk_host_list_dns.split(',')
+    if os.path.isfile('/var/zookeeper_hosts_overide.lock'):
+        zk_host_list_dns = open('/var/zookeeper_hosts.json').readlines()[0].strip()
+        zk_host_list_dns = zk_host_list_dns.split(',')
+        zookeeper_hosts = zk_host_list_dns
+    else:
+        zookeeper_hosts = []
+        for i in xrange(int(self.zk_count)):
+            zookeeper_hosts.append( "%s-%s" % (i+1,self.zk_hostname) )
+            
     zk_host_list = []
-    for aname in zk_host_list_dns:
-        try:
-            data =  dns.resolver.query(aname.strip(), 'A')
-            zk_host_list.append(data[0].to_text()+':2181')
-        except:
-            print 'ERROR, dns.resolver.NXDOMAIN',aname
-    return zk_host_list
+    for zk_host in  zookeeper_hosts:
+            zk_host_list.append(zk_host+':2181')
 
-def get_zk_host_str(zk_host_list):
-    zk_host_str = ','.join(zk_host_list)
+    zk_host_str = ','.join(zk_host_list)  
+    
+#     zk_host_list_dns = open('/var/zookeeper_hosts.json').readlines()[0]
+#     zk_host_list_dns = zk_host_list_dns.split(',')
+#     zk_host_list = []
+#     for aname in zk_host_list_dns:
+#         try:
+#             data =  dns.resolver.query(aname.strip(), 'A')
+#             zk_host_list.append(data[0].to_text()+':2181')
+#         except:
+#             print 'ERROR, dns.resolver.NXDOMAIN',aname
+            
     return zk_host_str
+
+
 
 def get_zk_conn():
     zk_host_list = get_zk_host_list()
     if zk_host_list:
-        zk_host_str = get_zk_host_str(zk_host_list)
-        zk = KazooClient(hosts=zk_host_str, read_only=True)
+        zk = KazooClient(hosts=zk_host_list, read_only=True)
         zk.start()
     else:
         zk = None
