@@ -95,8 +95,6 @@ def get_zk_host_list():
             
     return zk_host_str
 
-
-
 def get_zk_conn():
     zk_host_list = get_zk_host_list()
     if zk_host_list:
