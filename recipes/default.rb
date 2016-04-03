@@ -114,6 +114,21 @@ if server_type == "mysql"
 =end
 end
 
+if server_type == "global"
+  cluster_index = File.read("/var/cluster_index.txt")
+  cluster_index = cluster_index.gsub(/\n/, "") 
+  template "/etc/mysql/my.cnf" do
+    path "/etc/mysql/my.cnf"
+    source "my.5.7.index.cnf.erb"
+    owner "root"
+    group "root"
+    mode "0644"
+    notifies :start, resources(:service => "mysql")
+    variables :cluster_index => cluster_index
+    #variables {{:cluster_index => File.read("/var/cluster_index.txt").gsub(/\n/, "")}}
+    #only_if {File.exists?("/var/cluster_index.txt")}
+  end
+end
 
 
 if server_type == "fabric"
