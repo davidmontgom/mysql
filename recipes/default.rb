@@ -40,7 +40,7 @@ cookbook_file "#{Chef::Config[:file_cache_path]}/pubkey_mysql.asc" do
 end
 =end
 
-bash "install_mysql" do
+bash "install_apt_mysql" do
   user "root"
   cwd "#{Chef::Config[:file_cache_path]}"
   code <<-EOH
@@ -49,7 +49,17 @@ bash "install_mysql" do
     gpg --export -a 5072e1f5 > pubkey_mysql.asc
     sudo apt-key add pubkey_mysql.asc
     echo 'deb http://repo.mysql.com/apt/ubuntu trusty mysql-5.7' | tee -a /etc/apt/sources.list.d/mysql.list
-    sudo apt-get update
+    touch #{Chef::Config[:file_cache_path]}/mysql_deb.lock
+  EOH
+  action :run
+  not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql_deb.lock")}
+end
+
+
+bash "install_mysql" do
+  user "root"
+  cwd "#{Chef::Config[:file_cache_path]}"
+  code <<-EOH
     export DEBIAN_FRONTEND=noninteractive
     apt-get -q -y install mysql-server
     touch #{Chef::Config[:file_cache_path]}/mysql.lock
