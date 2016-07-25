@@ -27,22 +27,29 @@ EOH
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/fabric_user_store.lock")}
 end
 
-
-bash "install_fabric" do
-  user "root"
-  cwd "#{Chef::Config[:file_cache_path]}"
-  code <<-EOH
-    sudo mkdir -p /usr/share/pyshared/mysql
-    wget http://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python_2.1.3-1ubuntu14.04_all.deb
-    dpkg -i mysql-connector-python_2.1.3-1ubuntu14.04_all.deb
-    wget http://dev.mysql.com/get/Downloads/MySQLGUITools/mysql-utilities_1.5.6-1ubuntu14.04_all.deb
-    dpkg -i mysql-utilities_1.5.6-1ubuntu14.04_all.deb
-    touch #{Chef::Config[:file_cache_path]}/fabric.lock
-  EOH
-  action :run
-  not_if {File.exists?("#{Chef::Config[:file_cache_path]}/fabric.lock")}
+remote_file "#{Chef::Config[:file_cache_path]}/mysql-connector-python_2.1.3-1ubuntu14.04_all.deb" do
+    source "http://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python_2.1.3-1ubuntu14.04_all.deb"
+    action :create_if_missing
 end
 
+remote_file "#{Chef::Config[:file_cache_path]}/mysql-utilities_1.5.6-1ubuntu14.04_all.deb" do
+    source "http://dev.mysql.com/get/Downloads/MySQLGUITools/mysql-utilities_1.5.6-1ubuntu14.04_all.deb"
+    action :create_if_missing
+end
+
+dpkg_package "#{Chef::Config[:file_cache_path]}/mysql-connector-python_2.1.3-1ubuntu14.04_all.deb" do
+  action :install
+end
+
+dpkg_package "#{Chef::Config[:file_cache_path]}/mysql-utilities_1.5.6-1ubuntu14.04_all.deb" do
+  action :install
+end
+
+directory "/usr/share/pyshared/mysql" do
+  mode "0666"
+  recursive true
+  action :create
+end
 
 
 template "/etc/mysql/fabric.cfg" do
