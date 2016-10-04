@@ -37,7 +37,7 @@ basedir		= /usr
 datadir		= /data/mysql
 tmpdir		= /tmp
 lc-messages-dir	= /usr/share/mysql
-explicit_defaults_for_timestamp
+############explicit_defaults_for_timestamp
 
 # Instead of skip-networking the default is now to listen only on
 # localhost which is more compatible and is not less secure.
@@ -54,12 +54,15 @@ server-id = <%= @cluster_index %>
 log-bin = mysql-bin
 log-slave-updates = true
 # enable GTID
-gtid-mode = on
-enforce-gtid-consistency = true
+############gtid-mode = on
+############enforce-gtid-consistency = true
 
-show_compatibility_56 = on
+############show_compatibility_56 = on
 
 # * IMPORTANT: Additional settings that can override those from this file!
 #   The files must end with '.cnf', otherwise they'll be ignored.
 #
 !includedir /etc/mysql/conf.d/
+
+
+############ deelted for ryan but maybee readd for fabricy
