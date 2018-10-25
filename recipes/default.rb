@@ -175,7 +175,7 @@ bash "add_user" do
     echo "FLUSH PRIVILEGES;" | mysql -u root -pTest101
     echo "SET sql_log_bin = 1;" | mysql -u root -pTest101
     
-    touch #{Chef::Config[:file_cache_path]}/mysql_user.lock
+    touch #{Chef::Configmysql [:file_cache_path]}/mysql_user.lock
   EOH
   action :run
   not_if {File.exists?("#{Chef::Config[:file_cache_path]}/mysql_user.lock")}
